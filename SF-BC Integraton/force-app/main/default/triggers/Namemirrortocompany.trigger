@@ -1,0 +1,1 @@
+trigger Namemirrortocompany on Lead (before insert) {}

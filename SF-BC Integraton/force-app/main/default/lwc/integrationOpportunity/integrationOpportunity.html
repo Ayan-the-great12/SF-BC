@@ -1,0 +1,117 @@
+<template>
+    <div class="container">
+        <!--loading spinner-->
+        <div if:true={spinner}>
+            <div data-id="spinnerId" class="slds-spinner_container">
+                <lightning-spinner data-id="Spinner" alternative-text="Loading" size="medium" variant="brand">
+                </lightning-spinner>
+            </div>
+        </div>
+        <div class="slds-page-header slds-page-header_joined" role="banner">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-today">
+                                 <lightning-icon icon-name="custom:custom15" alternative-text=""></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-var-p-right_x-small">Opportunity to sync
+                                            <lightning-badge label={selectedRowsCount} icon-name="utility:success">
+                                            </lightning-badge>
+                                        </span>
+                                        <span class="slds-page-header__title slds-cell-wrap" title=" All Opportunities"> All Opportunities
+                                        </span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header__row slds-grid slds-m-top_x-small">
+                <div if:true={recordsCount}>
+                    <div class="slds-grid slds-m-top_xx-small ">
+                        <div class="slds-col slds-align-left">
+                            <p>
+                                {recordsCount}+ records showing
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={isOpenSingleRecord}>
+                    <div class="slds-grid slds-m-top_xx-small ">
+                        <div class="slds-col slds-align-left">
+                            <p>
+                                1 record showing
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-grid" style="justify-content: flex-end;">
+                    <div class="slds-m-top_x-small" style="margin-top: 5px;">
+                        <lightning-input type="checkbox" data-id="viewAllCheckbox" checked={isChecked} onchange={filterDataOnExternalId}></lightning-input>
+                    </div>
+                    <div class="slds-m-left_small">
+                        <label class="slds-form-element__label slds-p-top_x-small">Synced?</label>
+                    </div>
+                    <div class="slds-m-top_x-small slds-m-right_medium" style="margin-top: 5px;">
+                        <lightning-helptext
+                            content="The Opportunities need to be Insert or Update."
+                        ></lightning-helptext>
+                    </div> 
+                    <div class="slds-m-left_xx-small">
+                        <label class="slds-form-element__label slds-p-top_x-small">From</label>
+                    </div>
+    
+                    <div class="slds-m-left_xx-small" style="width: 10%;">
+                        <lightning-input name='fromDate' type="date" date-style="short" variant="label-hidden" value={fromDate} onchange={filterData}></lightning-input>
+                    </div>
+    
+                    <div class="slds-m-left_small">
+                        <label class="slds-form-element__label slds-p-top_x-small">To</label>
+                    </div>
+                    <div class="slds-m-left_xx-small" style="width: 10%;">
+                        <lightning-input name='toDate' type="date" date-style="short" variant="label-hidden" value={toDate} onchange={filterData}></lightning-input>
+                    </div>
+                    <div if:true={isChecked}>
+                        <div class="slds-m-left_medium">
+                            <lightning-button label="Update Opportunity to BC " variant="brand" icon-name="utility:sync"
+                            name="Sync Opportunities" disabled={disableSyncButton} onclick={updatedOpportunities}>
+                        </lightning-button>
+                        </div>
+                    </div>
+                    <div if:false={isChecked}>
+                        
+                        <div class="slds-m-left_medium">
+                            <lightning-button label="Sync Opportunity to BC " variant="brand" icon-name="utility:sync"
+                            name="Sync Opportunities" disabled={disableSyncButton} onclick={syncOpportunities}>
+                        </lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slds-grid slds-m-bottom_xx-large">
+            <div>
+                <div if:true={OpportunityExist} style="height:1200px">
+                    <lightning-datatable data-id="accountTable" key-field="Id" 
+                        data={allOpportunities} columns={columns} enable-infinite-loading
+                        onsort={handleSort} onrowselection={updateSelectedText} sorted-by={sortBy} sorted-direction={sortDirection}
+                        onloadmore={loadMoreDataHandler}>
+                    </lightning-datatable>
+                </div>
+                <div if:false={OpportunityExist}>
+                    <div class="slds-illustration slds-illustration_small">
+                        <img src={emptyStateResourceURL}>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+</template>

@@ -1,0 +1,152 @@
+<aura:component controller="EDAIntegrationController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    <!--Loading resources-->
+    <ltng:require styles="{!$Resource.NoHeader}" />
+
+    <!--Data Atrributes-->
+    <aura:attribute name="spinner" type="boolean" default="false" />
+    <aura:attribute name="showSplash" type="boolean" default="false" />
+    <aura:attribute name="sortField" type="String" />
+    <aura:attribute name="sortAsc" type="Boolean" default="true" />
+    <aura:attribute name="pageNumber" type="Integer" default="1" />
+    <aura:attribute name="maxPage" type="Integer" default="1" />
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}" />
+    <aura:attribute name="isSelectAll" type="string" default="" />
+    <aura:attribute name="totalSyncedAccounts" type="Integer" default="0" />
+    <aura:attribute name="allAccounts" type="List" default="[]"/>
+    <aura:attribute name="selectedRecords" type="Object" />
+    <aura:attribute name="accountList" type="List" default="[]" />
+    <aura:attribute name="accountsMap" type="Map" />
+    <aura:attribute name="multiMidKeysList" type="List" default="[]"/>
+    <aura:attribute name="disableSyncBtn" type="boolean" default="true" />
+    <aura:attribute name="recordsCount" type="Integer" default="0" />
+    <aura:attribute name="useFullAmountForAVS" type="boolean" default="false" />
+    <aura:attribute name="recDetail" type="sObject" />
+    <aura:attribute name="showAccModal" type="boolean" default="false" />
+    <aura:attribute name="showTakePayModal" type="boolean" default="false" />
+    <aura:attribute name="showReqPayModal" type="boolean" default="false" />
+    <aura:attribute name="isOpenSingleRecord" type="boolean" default="false" />
+    <aura:attribute name="setRecordId" type="String" />
+    <aura:attribute name="accDetail" type="Account" />
+    <aura:attribute name="saveCardsList" type="List" />
+    <aura:attribute name="saveACHList" type="List" />
+    <aura:attribute name="taxTitle" type="string" default="" />
+    <aura:attribute name="settings" type="Object" />
+    <aura:attribute name="emailTemplist" type="list" />
+    <aura:attribute name="accountPaymentRow" type="boolean" default="true" />
+    <aura:attribute name="showWarn" type="Boolean" default="false" required="true" />
+    
+    <!-- =====Data table attribute == -->
+    <aura:attribute name="accountColumns" type="List" />
+    <aura:attribute name="accountData" type="Object" />
+    <aura:attribute name="sortBy" type="String" />
+    <aura:attribute name="sortDirection" type="String" />
+    <aura:attribute name="maxRowSelection" type="Integer" default="50" />
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0" />
+    <!-- =========== -->
+    
+    <!--Event Handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+    <!-- =========== -->
+
+    <div class="container">
+        <!--loading spinner-->
+        <aura:if isTrue="{!v.spinner}">
+            <div aura:id="spinnerId" class="slds-spinner_container" style="position: fixed;">
+                <lightning:spinner aura:id="spinner" alternativeText="Loading" size="medium" variant="brand" />
+            </div>
+        </aura:if>
+        <!-- =========== -->
+
+        <!--Main Page Content Area-->
+        <div class="slds-card slds-card_boundary slds-grid slds-grid--vertical">
+            <!--Custom Page Header-->
+            <div class="slds-page-header  slds-page-header_joined slds-page-header_bleed slds-page-header slds-shrink-none">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-custom-custom15">
+                                    <lightning:icon iconName="custom:custom15" alternativeText="" />
+                                </span>
+                            </div>
+
+                            <div class="slds-media__body slds-align-middle">
+                                <nav role="navigation" aria-label="Breadcrumbs">
+                                    <ol class="slds-breadcrumb slds-list--horizontal slds-wrap">
+                                        <li class="slds-breadcrumb__item slds-line-height--reset">
+                                            <span class="slds-var-p-right_x-small">Accounts to sync
+                                                <lightning:badge label="{!v.selectedRowsCount}" iconName="utility:success" />
+                                            </span>
+                                        </li>
+                                    </ol>
+                                </nav>
+                                <div class="slds-grid">
+                                    <h1 class="slds-truncate slds-page-header__title slds-text-color--default">
+                                        <div class="slds-p-right--x-large">
+                                            <span class="slds-page-header__title slds-cell-wrap" title="All Accounts">
+                                                All Accounts
+                                            </span>
+                                        </div>
+                                    </h1>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom--xx-small">
+                        <div class="slds-col slds-no-flex slds-grid slds-align-top slds-shrink slds-m-right_small">
+                        </div>
+                        <div class="slds-col slds-no-flex slds-grid slds-align-top slds-shrink">
+                            <lightning:button label="Sync Account to BC" variant="brand" iconName="utility:sync" name="Sync Account" disabled="{!v.disableSyncBtn}" onclick="{!c.syncAccounts}" />
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-align-bottom">
+                        <p class="slds-text-body--small">
+                        </p>
+                    </div>
+                </div>
+                <aura:renderIf isTrue="{!v.recordsCount &gt; 10}">
+                <div class="slds-grid slds-m-top_xx-small ">
+                    <div class="slds-col slds-align-left">
+                        <p >
+                            {!v.recordsCount}+ records showing
+                        </p>
+                    </div>
+                </div>
+            </aura:renderIf>
+            <aura:renderIf isTrue="{!v.isOpenSingleRecord}">
+                <div class="slds-grid slds-m-top_xx-small ">
+                    <div class="slds-col slds-align-left">
+                        <p >
+                            1 record showing 
+                        </p>
+                    </div>
+                </div>
+            </aura:renderIf>
+            </div>
+            <!-- =========== -->
+            <div class="slds-grid slds-m-bottom_xx-large">
+                <div style="height :800px; width:100%">
+                    <aura:renderIf isTrue="{!v.allAccounts.length &gt; 0}">
+                        <lightning:datatable aura:id="accountTable" keyField="Id"  class="customDataTable" hideCheckboxColumn="false"  
+                            columns="{!v.accountColumns}" data="{!v.allAccounts}" sortedBy="{!v.sortBy}" sortedDirection="{!v.sortDirection}"
+                            onsort="{!c.handleSort}" onrowselection="{! c.updateSelectedText }" showRowNumberColumn="true" 
+                           />
+                        <aura:set attribute="else">
+                            <div class="slds-illustration slds-illustration_small">
+                                <img src="{!$Resource.EmptyState}" />
+                            </div>
+                        </aura:set>
+                    </aura:renderIf>
+                </div>
+            </div>
+            <!--============Start Pagination==========-->
+            <aura:renderIf isTrue="{!v.allAccounts.length &gt; 0}">
+            </aura:renderIf>
+            <!-- =========== -->
+        </div>
+    </div>
+</aura:component>

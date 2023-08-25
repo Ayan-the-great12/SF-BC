@@ -1,0 +1,99 @@
+<template>
+    <div class="container">
+        <!--loading spinner-->
+        <div if:true={spinner}>
+            <div data-id="spinnerId" class="slds-spinner_container">
+                <lightning-spinner data-id="Spinner" alternative-text="Loading" size="medium" variant="brand">
+                </lightning-spinner>
+            </div>
+        </div>
+        <!-- =========== -->
+        <div class="slds-card slds-card_boundary slds-grid slds-grid--vertical">
+            <div
+                class="slds-page-header  slds-page-header_joined slds-page-header_bleed slds-page-header slds-shrink-none">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-custom-custom15">
+                                    <lightning-icon icon-name="custom:custom15" alternative-text=""></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body slds-align-middle">
+                                <nav role="navigation" aria-label="Breadcrumbs">
+                                    <ol class="slds-breadcrumb slds-list--horizontal slds-wrap">
+                                        <li class="slds-breadcrumb__item slds-line-height--reset">
+                                            <span class="slds-var-p-right_x-small">WithDrawal to sync
+                                                <lightning-badge label={selectedRowsCount} icon-name="utility:success">
+                                                </lightning-badge>
+                                            </span>
+                                        </li>
+                                    </ol>
+                                </nav>
+                                <div class="slds-grid">
+                                    <h1 class="slds-truncate slds-page-header__title slds-text-color--default">
+                                        <div class="slds-p-right--x-large">
+                                            <span class="slds-page-header__title slds-cell-wrap" title="All WithDrawals">
+                                                All WithDrawals
+                                            </span>
+                                        </div>
+                                    </h1>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom--xx-small">
+                        <div class="slds-col slds-no-flex slds-grid slds-align-top slds-shrink alignment">
+                            <lightning-button label="Sync WithDrawals to BC " variant="brand" icon-name="utility:sync"
+                                name="Sync Accounts" disabled={disableSyncButton} onclick={syncWithdrawals}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-align-bottom">
+                        <p class="slds-text-body--small">
+                        </p>
+                    </div>
+                </div>
+                <div if:true={recordsCount}>
+                    <div class="slds-grid slds-m-top_xx-small ">
+                        <div class="slds-col slds-align-left">
+                            <p>
+                                {recordsCount}+ records showing
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={isOpenSingleRecord}>
+                    <div class="slds-grid slds-m-top_xx-small ">
+                        <div class="slds-col slds-align-left">
+                            <p>
+                                1 record showing
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="slds-grid slds-m-bottom_xx-large">
+                <div class="dataTable">
+                    <div if:true={withdrawalExist} style="height:1200px">
+                        <lightning-datatable data-id="accountTable" key-field="Id" 
+                            data={allWithdrawals} columns={columns} enable-infinite-loading
+                            onsort={handleSort} onrowselection={updateSelectedText} sorted-by={sortBy} sorted-direction={sortDirection}
+                            onloadmore={loadMoreDataHandler}>
+                        </lightning-datatable>
+                    </div>
+                    <div if:false={withdrawalExist}>
+                        <div class="slds-illustration slds-illustration_small">
+                            <img src={emptyStateResourceURL}>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+</template>
